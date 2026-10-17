@@ -205,7 +205,7 @@
 
   /* ---------- Grid ---------- */
   main.wrap { padding-top: 32px; padding-bottom: 64px; }
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 440px), 1fr)); gap: 24px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr)); gap: 20px; }
   .card {
     display: flex; flex-direction: column; padding: 26px !important;
     background: var(--bg);
@@ -266,6 +266,14 @@
   /* ---------- Footer ---------- */
   footer { border-top: 1px solid var(--line); background: var(--panel); }
   footer .wrap { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px; padding-top: 24px; padding-bottom: 28px; font-size: 13px; color: var(--muted); }
+  .foot-left { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+  .visits {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 4px 10px; border-radius: 999px; background: var(--bg); border: 1px solid var(--line);
+    font-size: 12px; color: var(--muted);
+  }
+  .visits[hidden] { display: none; }
+  .visits b { color: var(--ink); font-weight: 700; }
   .socials { display: flex; flex-wrap: wrap; gap: 8px; }
   .social {
     display: inline-flex; align-items: center; gap: 8px;
@@ -361,7 +369,13 @@
 
 <footer>
   <div class="wrap">
-    <span>© <span id="yr"></span> Bhargav · Built and maintained by me</span>
+    <div class="foot-left">
+      <span>© <span id="yr"></span> Bhargav · Built and maintained by me</span>
+      <span class="visits" id="visits" hidden>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>
+        <b>–</b> visits
+      </span>
+    </div>
     <div class="socials">
       <a class="social li" href="https://www.linkedin.com/in/bhargav-k-705a93178/" target="_blank" rel="noopener">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.86 0-2.14 1.45-2.14 2.94v5.67H9.34V9h3.42v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.73C24 .77 23.2 0 22.22 0z"/></svg>
@@ -411,6 +425,23 @@
       category: "Extensions",
       status: "Live",
       icon: "📰"
+    },
+    {
+      name: "File Lock",
+      tagline: "Password-protect Office files before you share them.",
+      desc: "Right-click any Word, Excel or PowerPoint file and lock it with a strong password in seconds. Send the file by email and the password separately, and only the right person can open it.",
+      points: [
+        "Right-click to lock, or lock many files at once",
+        "Creates a strong password and copies it for you",
+        "Keeps your original safe — saves a locked copy beside it",
+        "Recipients need nothing extra, just Office"
+      ],
+      meta: "Windows 10 / 11 · Free",
+      cta: "View & download",
+      url: "https://github.com/Ghosteye20/file-lock",
+      category: "Security",
+      status: "Live",
+      icon: "🔐"
     }
     // ,{
     //   name: "Tool name",
@@ -449,6 +480,22 @@
     <div class="stat"><b>${APPS.length}</b><span>Apps</span></div>
     <div class="stat"><b>${APPS.filter(isLive).length}</b><span>Live</span></div>
     <div class="stat"><b>${cats.length}</b><span>Categories</span></div>`;
+
+  // ============ VISIT COUNTER (GoatCounter) ============
+  // Your GoatCounter code — the part before ".goatcounter.com".
+  // Change this if you picked a different code when signing up.
+  const GOATCOUNTER_CODE = "ghosteye20";
+
+  (function loadVisits() {
+    const box = document.getElementById('visits');
+    if (!box) return;
+    const show = d => { if (d && d.count) { box.querySelector('b').textContent = d.count; box.hidden = false; } };
+    fetch(`https://${GOATCOUNTER_CODE}.goatcounter.com/counter/TOTAL.json`)
+      .then(r => r.ok ? r.json() : null)
+      .then(show)
+      .catch(() => {});   // if the counter isn't set up yet, the box simply stays hidden
+  })();
+  // =====================================================
 
   function renderTabs() {
     const all = [['All', APPS.length], ...cats.map(c => [c, APPS.filter(a => a.category === c).length])];
@@ -512,5 +559,7 @@
   renderTabs();
   render();
 </script>
+<!-- Counts each visit (no cookies). Change "ghosteye20" here too if your code is different. -->
+<script data-goatcounter="https://ghosteye20.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 </body>
 </html>
