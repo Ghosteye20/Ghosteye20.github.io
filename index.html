@@ -296,11 +296,162 @@
     .lede { font-size: 16.5px; }
     .grid { grid-template-columns: 1fr; }
   }
+
+  /* =====================================================
+     LIQUID GLASS THEME
+     Frosted, see-through surfaces over soft colour glows.
+     Delete this whole block to go back to the plain look.
+     ===================================================== */
+  :root {
+    --glass: rgba(255,255,255,.4);
+    --glass-strong: rgba(255,255,255,.62);
+    --glass-edge: rgba(255,255,255,.75);
+    --glass-blur: blur(22px) saturate(185%);
+    --glass-shadow:
+      inset 0 1px 0 rgba(255,255,255,.95),
+      inset 0 -1px 0 rgba(255,255,255,.35),
+      inset 0 0 0 1px rgba(255,255,255,.35),
+      0 1px 2px rgba(31,38,135,.06),
+      0 12px 40px -12px rgba(31,38,135,.22);
+    --radius: 28px;
+  }
+  html { background: #f6f7fb; }
+  body { background: transparent; position: relative; min-height: 100vh; }
+
+  /* Soft colour glows that sit behind the glass */
+  .backdrop { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; background: #f6f7fb; }
+  .backdrop i {
+    position: absolute; border-radius: 50%; filter: blur(70px); opacity: .6;
+    animation: drift 26s ease-in-out infinite alternate;
+  }
+  .backdrop i:nth-child(1) { width: 46vw; height: 46vw; left: -10vw; top: -12vw; background: #818cf8; }
+  .backdrop i:nth-child(2) { width: 40vw; height: 40vw; right: -8vw; top: 6vh;  background: #e879f9; animation-duration: 32s; }
+  .backdrop i:nth-child(3) { width: 38vw; height: 38vw; left: 22vw; top: 48vh;  background: #5eead4; animation-duration: 38s; }
+  .backdrop i:nth-child(4) { width: 34vw; height: 34vw; right: 4vw; bottom: -10vw; background: #fcd34d; animation-duration: 30s; }
+  @keyframes drift {
+    0%   { transform: translate(0,0) scale(1); }
+    50%  { transform: translate(4vw,3vh) scale(1.08); }
+    100% { transform: translate(-3vw,-2vh) scale(.95); }
+  }
+  @media (prefers-reduced-motion: reduce) { .backdrop i { animation: none; } }
+
+  /* One recipe for every glass surface */
+  .glass, .topbar-inner, .eyebrow, .step, .stats, .toolbar-inner, .card, .gh, .social, .visits, footer .wrap {
+    position: relative;
+    background: var(--glass);
+    -webkit-backdrop-filter: var(--glass-blur);
+            backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-edge);
+    box-shadow: var(--glass-shadow);
+  }
+  /* Glossy highlight across the top of each panel */
+  .topbar-inner::before, .step::before, .stats::before, .toolbar-inner::before, .card::before, footer .wrap::before {
+    content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+    background:
+      linear-gradient(180deg, rgba(255,255,255,.55) 0%, rgba(255,255,255,0) 38%),
+      radial-gradient(120% 60% at 0% 0%, rgba(255,255,255,.45), transparent 55%);
+    mix-blend-mode: soft-light;
+  }
+
+  /* Top bar → floating glass pill */
+  .topbar { display: block; padding: 16px 24px 0; }
+  .topbar-inner {
+    display: flex; align-items: center; justify-content: space-between;
+    max-width: 1072px; margin: 0 auto; padding: 10px 12px 10px 14px; border-radius: 999px;
+  }
+  .avatar { border-radius: 50%; box-shadow: 0 6px 16px -6px rgba(79,70,229,.6), inset 0 1px 0 rgba(255,255,255,.4); }
+  .nav-link { border-radius: 999px; }
+  .nav-link:hover { background: rgba(255,255,255,.55); }
+  .gh, .social { border-radius: 999px; }
+  .gh:hover, .social:hover { background: var(--glass-strong); border-color: #fff; }
+
+  /* Hero */
+  .hero::before { display: none; }
+  .eyebrow { background: rgba(255,255,255,.5); }
+  .step { border-radius: 22px; }
+  .step.now { border-color: #fff; box-shadow: var(--glass-shadow), 0 0 0 4px rgba(129,140,248,.18); }
+  .journey::before { background: repeating-linear-gradient(90deg, rgba(100,116,139,.25) 0 6px, transparent 6px 12px); }
+  .step-ico, .icon {
+    background: linear-gradient(160deg, rgba(255,255,255,.9), var(--tint, var(--brand-soft)));
+    border: 1px solid rgba(255,255,255,.9);
+    box-shadow: inset 0 1px 0 #fff, 0 4px 12px -4px rgba(31,38,135,.18);
+  }
+  .stats { border-radius: 22px; overflow: visible; }
+  .stat + .stat { border-left: 1px solid rgba(255,255,255,.7); }
+
+  /* Toolbar → floating glass pill that sticks while scrolling */
+  .toolbar { background: transparent; border: 0; -webkit-backdrop-filter: none; backdrop-filter: none; padding: 12px 0; }
+  .toolbar .wrap { padding-top: 0; padding-bottom: 0; }
+  .toolbar-inner { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; width: 100%; padding: 8px; border-radius: 999px; }
+  .toolbar-inner { background: rgba(255,255,255,.72); -webkit-backdrop-filter: blur(30px) saturate(190%); backdrop-filter: blur(30px) saturate(190%); }
+  .tab { border-radius: 999px; }
+  .tab:hover { background: rgba(255,255,255,.6); }
+  .tab[aria-pressed="true"] {
+    background: linear-gradient(180deg, #312e81, #1e1b4b); color: #fff;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.25), 0 6px 16px -6px rgba(30,27,75,.6);
+  }
+  .search { border-radius: 999px; background: rgba(255,255,255,.55); border: 1px solid rgba(255,255,255,.8); box-shadow: inset 0 1px 2px rgba(31,38,135,.08); }
+  .search:focus-within { background: rgba(255,255,255,.8); border-color: #c7d2fe; box-shadow: 0 0 0 4px rgba(129,140,248,.2); }
+  .kbd { background: rgba(255,255,255,.6); }
+
+  /* App cards */
+  .card { border-radius: var(--radius); overflow: hidden; }
+  a.card { transition: transform .35s cubic-bezier(.2,.8,.2,1), box-shadow .35s ease, background .35s ease; }
+  a.card:hover {
+    transform: translateY(-4px) scale(1.008);
+    background: var(--glass-strong); border-color: #fff;
+    box-shadow:
+      inset 0 1px 0 #fff, inset 0 0 0 1px rgba(255,255,255,.5),
+      0 2px 4px rgba(31,38,135,.06), 0 24px 60px -18px rgba(31,38,135,.32);
+  }
+  /* Light sheen that follows the cursor */
+  .card::after {
+    content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; opacity: 0;
+    background: radial-gradient(260px circle at var(--mx, 50%) var(--my, 0%), rgba(255,255,255,.55), transparent 60%);
+    transition: opacity .3s ease;
+  }
+  a.card:hover::after { opacity: 1; }
+  .card > * { position: relative; z-index: 1; }
+  .points { background: rgba(255,255,255,.45); border: 1px solid rgba(255,255,255,.75); border-radius: 18px; box-shadow: inset 0 1px 0 rgba(255,255,255,.9); }
+  .card-foot { border-top: 1px solid rgba(255,255,255,.75); }
+  .cat { background: rgba(255,255,255,.55); border: 1px solid rgba(255,255,255,.85); border-radius: 999px; padding: 4px 11px; }
+  .badge { -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,.7); }
+  .badge.live { background: rgba(236,253,245,.75); }
+  .open {
+    padding: 7px 14px; border-radius: 999px; color: #fff;
+    background: linear-gradient(180deg, #6366f1, #4f46e5);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.35), 0 6px 16px -6px rgba(79,70,229,.7);
+  }
+  .soon .open { background: rgba(255,255,255,.6); color: var(--muted); box-shadow: none; }
+  .open, .cat { white-space: nowrap; }
+  .card-foot { flex-wrap: wrap; row-gap: 10px; }
+  .empty { background: var(--glass); -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur); border: 1px solid var(--glass-edge); }
+
+  /* Footer → glass panel */
+  footer { background: transparent; border-top: 0; padding: 0 24px 28px; }
+  footer .wrap { max-width: 1072px; border-radius: 24px; padding: 18px 20px; }
+  .visits { background: rgba(255,255,255,.5); }
+
+  /* Browsers without backdrop blur get a solid, readable fallback */
+  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .topbar-inner, .eyebrow, .step, .stats, .toolbar-inner, .card, .gh, .social, .visits, footer .wrap { background: rgba(255,255,255,.92); }
+  }
+
+  @media (max-width: 640px) {
+    .topbar { padding: 12px 12px 0; }
+    .topbar-inner { padding: 8px 8px 8px 10px; }
+    .nav-link { display: none; }
+    .toolbar-inner { border-radius: 24px; padding: 10px; }
+    footer { padding: 0 12px 20px; }
+    .card { border-radius: 24px; }
+  }
 </style>
 </head>
 <body>
+<div class="backdrop" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
 
-<div class="wrap topbar">
+<div class="topbar">
+  <div class="topbar-inner">
   <a class="brand" href="#">
     <span class="avatar">B<img src="https://avatars.githubusercontent.com/u/100502541?v=4" alt="" onerror="this.remove()"></span>
     <span class="brand-text"><b>Bhargav</b><span>@Ghosteye20</span></span>
@@ -312,6 +463,7 @@
     GitHub
   </a>
   </nav>
+  </div>
 </div>
 
 <section class="hero">
@@ -354,12 +506,14 @@
 
 <div class="toolbar" id="apps">
   <div class="wrap">
+   <div class="toolbar-inner">
     <div class="tabs" id="tabs" role="group" aria-label="Filter by category"></div>
     <label class="search">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
       <input id="q" type="search" placeholder="Search apps" aria-label="Search apps" autocomplete="off">
       <span class="kbd">/</span>
     </label>
+   </div>
   </div>
 </div>
 
@@ -568,6 +722,13 @@
     render();
   });
   q.addEventListener('input', render);
+  // Liquid-glass sheen follows the pointer across a card
+  grid.addEventListener('pointermove', e => {
+    const c = e.target.closest('.card'); if (!c) return;
+    const r = c.getBoundingClientRect();
+    c.style.setProperty('--mx', (e.clientX - r.left) + 'px');
+    c.style.setProperty('--my', (e.clientY - r.top) + 'px');
+  });
   document.addEventListener('keydown', e => {
     if (e.key === '/' && document.activeElement !== q) { e.preventDefault(); q.focus(); }
     if (e.key === 'Escape' && document.activeElement === q) { q.value = ''; render(); q.blur(); }
