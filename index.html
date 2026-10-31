@@ -266,14 +266,11 @@
   /* ---------- Footer ---------- */
   footer { border-top: 1px solid var(--line); background: var(--panel); }
   footer .wrap { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px; padding-top: 24px; padding-bottom: 28px; font-size: 13px; color: var(--muted); }
-  .foot-left { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
-  .visits {
-    display: inline-flex; align-items: center; gap: 6px;
-    padding: 4px 10px; border-radius: 999px; background: var(--bg); border: 1px solid var(--line);
-    font-size: 12px; color: var(--muted);
-  }
+  .foot-left { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+  .visits { font-size: 13px; color: var(--muted); }
+  .visits::before { content: "·"; margin-right: 8px; opacity: .6; }
   .visits[hidden] { display: none; }
-  .visits b { color: var(--ink); font-weight: 700; }
+  .visits b { color: var(--ink-2); font-weight: 600; }
   .socials { display: flex; flex-wrap: wrap; gap: 8px; }
   .social {
     display: inline-flex; align-items: center; gap: 8px;
@@ -285,6 +282,7 @@
   .social.li svg { color: #0a66c2; }
 
   @media (max-width: 640px) {
+    .visits::before { display: none; }
     .wrap { padding: 0 16px; }
     .hero { padding: 36px 0 32px; }
     .search { margin-left: 0; flex: 1 1 100%; order: -1; }
@@ -336,7 +334,7 @@
   @media (prefers-reduced-motion: reduce) { .backdrop i { animation: none; } }
 
   /* One recipe for every glass surface */
-  .glass, .topbar-inner, .eyebrow, .step, .stats, .toolbar-inner, .card, .gh, .social, .visits, footer .wrap {
+  .glass, .topbar-inner, .eyebrow, .step, .stats, .toolbar-inner, .card, .gh, .social, footer .wrap {
     position: relative;
     background: var(--glass);
     -webkit-backdrop-filter: var(--glass-blur);
@@ -430,11 +428,10 @@
   /* Footer → glass panel */
   footer { background: transparent; border-top: 0; padding: 0 24px 28px; }
   footer .wrap { max-width: 1072px; border-radius: 24px; padding: 18px 20px; }
-  .visits { background: rgba(255,255,255,.5); }
 
   /* Browsers without backdrop blur get a solid, readable fallback */
   @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-    .topbar-inner, .eyebrow, .step, .stats, .toolbar-inner, .card, .gh, .social, .visits, footer .wrap { background: rgba(255,255,255,.92); }
+    .topbar-inner, .eyebrow, .step, .stats, .toolbar-inner, .card, .gh, .social, footer .wrap { background: rgba(255,255,255,.92); }
   }
 
   @media (max-width: 640px) {
@@ -525,10 +522,7 @@
   <div class="wrap">
     <div class="foot-left">
       <span>© <span id="yr"></span> Bhargav · Built and maintained by me</span>
-      <span class="visits" id="visits" hidden>
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>
-        <b>–</b> visits
-      </span>
+      <span class="visits" id="visits" hidden><b>–</b> <span class="vl">visits</span></span>
     </div>
     <div class="socials">
       <a class="social li" href="https://www.linkedin.com/in/bhargav-k-705a93178/" target="_blank" rel="noopener">
@@ -652,21 +646,34 @@
     <div class="stat"><b>${APPS.filter(isLive).length}</b><span>Live</span></div>
     <div class="stat"><b>${cats.length}</b><span>Categories</span></div>`;
 
-  // ============ VISIT COUNTER (GoatCounter) ============
-  // Your GoatCounter code — the part before ".goatcounter.com".
-  // Change this if you picked a different code when signing up.
-  const GOATCOUNTER_CODE = "ghosteye20";
+  // ============ VISIT COUNTER ============
+  // Free counter, no sign-up needed. Counts each visitor once per browser
+  // session (refreshing the page doesn't add extra visits).
+  // To start a fresh count, change COUNTER_KEY to any new word.
+  const COUNTER_KEY = "ghosteye20-github-io-visits";
+  const COUNTER_API = "https://countapi.mileshilliard.com/api/v1";
 
   (function loadVisits() {
     const box = document.getElementById('visits');
     if (!box) return;
-    const show = d => { if (d && d.count) { box.querySelector('b').textContent = d.count; box.hidden = false; } };
-    fetch(`https://${GOATCOUNTER_CODE}.goatcounter.com/counter/TOTAL.json`)
+    // Don't count visits while you preview the file on your own computer
+    const isLive = location.hostname.endsWith('github.io');
+    let counted = false;
+    try { counted = sessionStorage.getItem('visit-counted') === '1'; } catch (e) {}
+    const action = (isLive && !counted) ? 'hit' : 'get';
+    fetch(`${COUNTER_API}/${action}/${COUNTER_KEY}`)
       .then(r => r.ok ? r.json() : null)
-      .then(show)
-      .catch(() => {});   // if the counter isn't set up yet, the box simply stays hidden
+      .then(d => {
+        const n = d && parseInt(d.value, 10);
+        if (!n && n !== 0) return;
+        if (action === 'hit') { try { sessionStorage.setItem('visit-counted', '1'); } catch (e) {} }
+        box.querySelector('b').textContent = n.toLocaleString('en-IN');
+        box.querySelector('.vl').textContent = n === 1 ? 'visit' : 'visits';
+        box.hidden = false;
+      })
+      .catch(() => {});   // if the counter service is down, the badge simply stays hidden
   })();
-  // =====================================================
+  // =======================================
 
   function renderTabs() {
     const all = [['All', APPS.length], ...cats.map(c => [c, APPS.filter(a => a.category === c).length])];
@@ -737,7 +744,5 @@
   renderTabs();
   render();
 </script>
-<!-- Counts each visit (no cookies). Change "ghosteye20" here too if your code is different. -->
-<script data-goatcounter="https://ghosteye20.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 </body>
 </html>
